@@ -68,6 +68,7 @@ public class PlayerTest : MonoBehaviour
         {
             Debug.Log("Pressed");
             rigidbody2D.AddForce(Vector2.up*jumpForce,ForceMode2D.Impulse);
+            audioSource.PlayOneShot(jumpAudio);
         }
         //if (press)
         //{
@@ -102,7 +103,13 @@ public class PlayerTest : MonoBehaviour
     {
         if (collision.gameObject.tag == "Bone")
         {
-            transform.localScale *= 0.8f;
+            if (!turn) { 
+                transform.localScale *= 0.8f;
+            }
+            else
+            {
+                transform.localScale *= 1.2f;
+            }
             audioSource.PlayOneShot(boneAudio);
             GameObject explosion = GameObject.Instantiate(effexplosion, collision.gameObject.transform.position, Quaternion.identity);
             GameObject.Destroy(explosion, 1.0f);
@@ -116,6 +123,9 @@ public class PlayerTest : MonoBehaviour
             animator.updateMode = AnimatorUpdateMode.UnscaledTime;      //アニメーションは動く
 
             StartCoroutine("Wait", 3);  //非同期モード待機用
+
+            PlayerPrefs.SetInt("Scores",score.score);
+            PlayerPrefs.Save();
         }
         if(collision.gameObject.tag == "Field")
         {
@@ -134,14 +144,14 @@ public class PlayerTest : MonoBehaviour
         if(collision.gameObject.tag == "Field") { 
             Debug.Log("isOff");
             isGround = false;
-            audioSource.PlayOneShot(jumpAudio);
+           
         }
     }
     IEnumerator Wait(float sec)
     {
         yield return new WaitForSecondsRealtime(sec);
         Time.timeScale = 1;     //標準速度に戻し（1倍速）
-        SceneManager.LoadScene("Title");
+        SceneManager.LoadScene("Result");
     }
 
     IEnumerator TurnCoolDown()
